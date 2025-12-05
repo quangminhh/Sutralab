@@ -31,10 +31,6 @@ export default function ContactPage() {
           title="Chúng tôi có thể biến dự án mơ ước của bạn thành hiện thực"
           mainMessage="Hãy trò chuyện với chúng tôi! 👋"
           contactEmail="minhtq@aisutralab.com"
-          onSubmit={(data) => {
-            console.log("Contact form submitted:", data)
-            // You can add API call here to send the form data
-          }}
         />
       </div>
 

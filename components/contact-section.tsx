@@ -54,10 +54,31 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit?.(formData)
-    console.log("Form submitted:", formData)
+    
+    // Call API if onSubmit prop is provided, otherwise use default API
+    if (onSubmit) {
+      onSubmit(formData)
+    } else {
+      // Default: call the contact API
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        })
+        const data = await response.json()
+        if (data.success) {
+          console.log("Contact form submitted successfully:", data)
+        }
+      } catch (error) {
+        console.error("Contact form submission error:", error)
+      }
+    }
+    
     // Reset form after submission
     setFormData({
       name: '',
