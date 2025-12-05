@@ -94,10 +94,13 @@ export default function Footer() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleCheckboxChange = (type: string, checked: boolean) => {
+  const handleCheckboxChange = (type: string, checked: boolean | "indeterminate") => {
+    // Only handle boolean values, ignore "indeterminate"
+    if (checked === "indeterminate") return
+    
     setFormData((prev) => {
       const currentTypes = prev.projectType
-      if (checked) {
+      if (checked === true) {
         return { ...prev, projectType: [...currentTypes, type] }
       } else {
         return { ...prev, projectType: currentTypes.filter((t) => t !== type) }
@@ -318,17 +321,24 @@ export default function Footer() {
                               ? 'bg-cyan-500/20 border-cyan-400'
                               : 'bg-white/5 border-white/20 hover:bg-white/10'
                           }`}
-                          onClick={() => handleCheckboxChange(option, !formData.projectType.includes(option))}
                         >
                           <Checkbox
                             id={`footer-${option.replace(/\s/g, '-').toLowerCase()}`}
                             checked={formData.projectType.includes(option)}
-                            onCheckedChange={(checked) => handleCheckboxChange(option, checked as boolean)}
+                            onCheckedChange={(checked) => {
+                              if (typeof checked === 'boolean') {
+                                handleCheckboxChange(option, checked)
+                              }
+                            }}
                             className="border-white/40 data-[state=checked]:bg-cyan-500"
                           />
                           <Label 
                             htmlFor={`footer-${option.replace(/\s/g, '-').toLowerCase()}`} 
                             className="text-sm text-gray-300 font-normal cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handleCheckboxChange(option, !formData.projectType.includes(option))
+                            }}
                           >
                             {option}
                           </Label>

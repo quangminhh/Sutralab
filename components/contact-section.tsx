@@ -17,20 +17,22 @@ interface ContactSectionProps {
   onSubmit?: (data: any) => void
 }
 
-const defaultSocialLinks = [
-  { id: '1', name: 'LinkedIn', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/linkedin.svg', href: contactInfo.social.linkedin },
-  { id: '2', name: 'Facebook', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/facebook.svg', href: contactInfo.social.facebook },
-  { id: '3', name: 'Twitter', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/x.svg', href: contactInfo.social.twitter },
-]
-
 export const ContactSection: React.FC<ContactSectionProps> = ({
   title = "Chúng tôi có thể biến dự án mơ ước của bạn thành hiện thực",
   mainMessage = "Hãy trò chuyện với chúng tôi! 👋",
   contactEmail = contactInfo.email.primary,
-  socialLinks = defaultSocialLinks,
+  socialLinks,
   backgroundImageSrc = "https://images.unsplash.com/photo-1742273330004-ef9c9d228530?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDY0fENEd3V3WEpBYkV3fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900",
   onSubmit,
 }) => {
+  // Default social links - defined inside component to avoid top-level import issues
+  const defaultSocialLinks = socialLinks || [
+    { id: '1', name: 'LinkedIn', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/linkedin.svg', href: contactInfo.social.linkedin },
+    { id: '2', name: 'Facebook', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/facebook.svg', href: contactInfo.social.facebook },
+    { id: '3', name: 'Twitter', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/x.svg', href: contactInfo.social.twitter },
+  ]
+  
+  const displaySocialLinks = socialLinks || defaultSocialLinks
   const [formData, setFormData] = React.useState({
     name: '',
     email: '',
@@ -43,10 +45,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleCheckboxChange = (type: string, checked: boolean) => {
+  const handleCheckboxChange = (type: string, checked: boolean | "indeterminate") => {
+    // Only handle boolean values, ignore "indeterminate"
+    if (checked === "indeterminate") return
+    
     setFormData((prev) => {
       const currentTypes = prev.projectType
-      if (checked) {
+      if (checked === true) {
         return { ...prev, projectType: [...currentTypes, type] }
       } else {
         return { ...prev, projectType: currentTypes.filter((t) => t !== type) }
@@ -143,7 +148,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
               </a>
               <div className="flex items-center space-x-3 mt-4">
                 <span className="text-muted-foreground">HOẶC</span>
-                {socialLinks.map((link) => (
+                {displaySocialLinks.map((link) => (
                   <Button key={link.id} variant="outline" size="icon" asChild>
                     <a href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.name}>
                       <img src={link.iconSrc} alt={link.name} className="h-4 w-4 dark:invert" />
@@ -206,9 +211,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       <Checkbox
                         id={option.replace(/\s/g, '-').toLowerCase()}
                         checked={formData.projectType.includes(option)}
-                        onCheckedChange={(checked) => handleCheckboxChange(option, checked as boolean)}
+                        onCheckedChange={(checked) => {
+                          if (typeof checked === 'boolean') {
+                            handleCheckboxChange(option, checked)
+                          }
+                        }}
                       />
-                      <Label htmlFor={option.replace(/\s/g, '-').toLowerCase()} className="text-sm font-normal">
+                      <Label htmlFor={option.replace(/\s/g, '-').toLowerCase()} className="text-sm font-normal cursor-pointer">
                         {option}
                       </Label>
                     </div>
