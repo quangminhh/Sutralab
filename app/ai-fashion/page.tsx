@@ -540,8 +540,7 @@ export default function AIFashionPage() {
         </div>
       </section>
 
-      {/* Multi-Industry Section - Videos and Male Model */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
+      {/* <section className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
@@ -555,7 +554,6 @@ export default function AIFashionPage() {
               </p>
             </div>
 
-            {/* Watch Image - At the top */}
             <div className="mb-12 max-w-4xl mx-auto">
               <div className="group">
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-gradient-to-br from-amber-900/30 to-yellow-900/30">
@@ -576,9 +574,7 @@ export default function AIFashionPage() {
               </div>
             </div>
 
-            {/* Videos Row - Below watch image */}
             <div className="grid lg:grid-cols-2 gap-10">
-              {/* Video 1 - Autoplay, loop, muted - Larger */}
               <div className="group">
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-black">
                   <video
@@ -600,7 +596,6 @@ export default function AIFashionPage() {
                 </div>
               </div>
 
-              {/* Video 2 - Autoplay, loop, muted - Larger */}
               <div className="group">
                 <div className="relative rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 bg-black">
                   <video
@@ -624,7 +619,7 @@ export default function AIFashionPage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       <Footer />
       
