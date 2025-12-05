@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { contactInfo } from "@/lib/contact-info"
 
 /**
  * Floating Chat Buttons Component
@@ -12,25 +13,25 @@ export function FloatingChatButtons() {
   const contactOptions = [
     {
       name: "Zalo",
-      href: "https://zalo.me/0923370804",
+      href: contactInfo.zalo.url,
       image: "/Contact us/Zalo.webp",
       label: "Nhắn tin Zalo"
     },
     {
       name: "WhatsApp",
-      href: "https://wa.me/84923370804",
+      href: contactInfo.whatsapp.url,
       image: "/Contact us/whatsapp-png.webp",
       label: "Nhắn tin WhatsApp"
     },
     {
       name: "Phone",
-      href: "tel:+84923370804",
+      href: `tel:${contactInfo.phone.primary}`,
       image: "/Contact us/telephone-call-support-png.webp",
-      label: "Gọi điện: +84 923 370 804"
+      label: `Gọi điện: ${contactInfo.phone.display.primary}`
     },
     {
       name: "Gmail",
-      href: "mailto:contact@example.com",
+      href: `mailto:${contactInfo.email.primary}`,
       image: "/Contact us/Gmail.webp",
       label: "Gửi email"
     }

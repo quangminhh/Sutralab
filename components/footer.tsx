@@ -2,13 +2,15 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Facebook, Twitter, Linkedin, Youtube, Mail, Phone, Calendar, Send, ChevronLeft, ChevronRight, MessageCircle } from 'lucide-react'
+import { Facebook, Twitter, Linkedin, Youtube, Mail, Phone, Calendar, Send, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "sonner"
 import React from "react"
+import { contactInfo } from "@/lib/contact-info"
 
 export default function Footer() {
   const [formData, setFormData] = React.useState({
@@ -18,6 +20,10 @@ export default function Footer() {
     message: '',
     projectType: [] as string[],
   })
+
+  // Loading states
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [isBooking, setIsBooking] = React.useState(false)
 
   // Calendar state
   const [currentDate, setCurrentDate] = React.useState(new Date())
@@ -99,17 +105,114 @@ export default function Footer() {
     })
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Form submitted:", formData)
-    alert("Cảm ơn bạn! Chúng tôi sẽ liên hệ lại sớm.")
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      message: '',
-      projectType: [],
-    })
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        toast.success('Gửi thành công!', {
+          description: data.message,
+        })
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          message: '',
+          projectType: [],
+        })
+      } else {
+        toast.error('Có lỗi xảy ra', {
+          description: data.message || 'Vui lòng thử lại sau.',
+        })
+      }
+    } catch (error) {
+      console.error('Form submission error:', error)
+      toast.error('Có lỗi xảy ra', {
+        description: 'Không thể gửi tin nhắn. Vui lòng thử lại sau.',
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleBooking = async () => {
+    if (!selectedDate || !selectedTime || !formData.email || !formData.name) {
+      toast.error('Vui lòng điền đầy đủ thông tin', {
+        description: 'Bạn cần chọn ngày, giờ và điền email, tên trong form liên hệ.',
+      })
+      return
+    }
+
+    setIsBooking(true)
+
+    try {
+      // Combine date and time into ISO 8601 format
+      const [hours, minutes] = selectedTime.split(':')
+      const bookingDateTime = new Date(selectedDate)
+      bookingDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0)
+
+      const response = await fetch('/api/cal-com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          startTime: bookingDateTime.toISOString(),
+          attendeeEmail: formData.email,
+          attendeeName: formData.name,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        const meetUrl = data.booking?.meetUrl
+        toast.success('Đặt lịch thành công!', {
+          description: meetUrl 
+            ? (
+              <div>
+                <p className="mb-2">Link Google Meet:</p>
+                <a 
+                  href={meetUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="underline text-blue-400 hover:text-blue-300"
+                >
+                  {meetUrl}
+                </a>
+              </div>
+            )
+            : data.message,
+          duration: 10000,
+        })
+        
+        // Reset calendar selection
+        setSelectedDate(null)
+        setSelectedTime(null)
+      } else {
+        toast.error('Không thể đặt lịch', {
+          description: data.message || 'Vui lòng thử lại sau hoặc liên hệ trực tiếp.',
+        })
+      }
+    } catch (error) {
+      console.error('Booking error:', error)
+      toast.error('Có lỗi xảy ra', {
+        description: 'Không thể đặt lịch. Vui lòng thử lại sau.',
+      })
+    } finally {
+      setIsBooking(false)
+    }
   }
 
   const projectTypeOptions = [
@@ -117,9 +220,6 @@ export default function Footer() {
     'AI Solutions', 'Automation', 'Marketing',
     'Consulting', 'Other'
   ]
-
-  // Cal.com booking link - Change this to your Cal.com URL
-  const bookingLink = "https://cal.com/sutralab/meeting"
 
   return (
     <footer id="contact" className="bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 text-white relative overflow-hidden">
@@ -239,10 +339,20 @@ export default function Footer() {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white py-5 text-base font-semibold"
+                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white py-5 text-base font-semibold disabled:opacity-50"
+                    disabled={isSubmitting}
                   >
-                    Gửi tin nhắn
-                    <Send className="ml-2 h-4 w-4" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Đang gửi...
+                      </>
+                    ) : (
+                      <>
+                        Gửi tin nhắn
+                        <Send className="ml-2 h-4 w-4" />
+                      </>
+                    )}
                   </Button>
                 </form>
               </div>
@@ -357,59 +467,32 @@ export default function Footer() {
                   </div>
                 )}
 
-                {/* Contact Options - Full */}
-                <div className="space-y-3">
-                  <p className="text-gray-300 text-sm mb-2">Xác nhận đặt lịch qua:</p>
-                  
-                  {/* Zalo */}
-                  <a 
-                    href={`https://zalo.me/0923370804${selectedDate && selectedTime ? `?text=${encodeURIComponent(`Xin chào, tôi muốn đặt lịch demo vào ngày ${formatSelectedDate()} lúc ${selectedTime}`)}` : ''}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-3 bg-blue-500 hover:bg-blue-600 text-white py-4 px-4 rounded-lg font-semibold transition-all"
+                {/* Booking Confirmation Button */}
+                {selectedDate && selectedTime && (
+                  <Button 
+                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-6 text-base font-semibold disabled:opacity-50"
+                    onClick={handleBooking}
+                    disabled={isBooking || !formData.email || !formData.name}
                   >
-                    <Image src="/Contact%20us/Zalo.webp" alt="Zalo" width={32} height={32} className="rounded w-8 h-8 object-contain" />
-                    Đặt qua Zalo
-                  </a>
-
-                  {/* WhatsApp */}
-                  <a 
-                    href={`https://wa.me/84923370804?text=${encodeURIComponent(selectedDate && selectedTime ? `Xin chào, tôi muốn đặt lịch demo vào ngày ${formatSelectedDate()} lúc ${selectedTime}` : 'Xin chào, tôi muốn đặt lịch demo')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white py-4 px-4 rounded-lg font-semibold transition-all"
-                  >
-                    <Image src="/Contact%20us/whatsapp-png.webp" alt="WhatsApp" width={32} height={32} className="rounded w-8 h-8 object-contain brightness-0 invert" />
-                    Đặt qua WhatsApp
-                  </a>
-
-                  {/* Email */}
-                  <a 
-                    href={`mailto:minhtq@aisutralab.com?subject=Đặt lịch Demo${selectedDate ? ` - ${formatSelectedDate()}` : ''}${selectedTime ? ` lúc ${selectedTime}` : ''}&body=${getBookingMessage()}`}
-                    className="w-full flex items-center justify-center gap-3 bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-lg font-semibold transition-all"
-                  >
-                    <Mail className="w-5 h-5" />
-                    Đặt qua Email
-                  </a>
-
-                  {/* Phone */}
-                  <a 
-                    href="tel:+84923370804"
-                    className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 px-4 rounded-lg font-semibold transition-all"
-                  >
-                    <Phone className="w-5 h-5" />
-                    Gọi: +84 923 370 804
-                  </a>
-
-                  {/* Secondary Phone */}
-                  <a 
-                    href="tel:+84386602022"
-                    className="w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white py-3 px-4 rounded-lg font-semibold transition-all"
-                  >
-                    <Phone className="w-5 h-5" />
-                    Gọi: +84 386 602 022
-                  </a>
-                </div>
+                    {isBooking ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Đang xử lý...
+                      </>
+                    ) : (
+                      <>
+                        Xác nhận đặt lịch
+                        <Calendar className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                )}
+                
+                {selectedDate && selectedTime && (!formData.email || !formData.name) && (
+                  <p className="text-xs text-yellow-400 mt-2 text-center">
+                    💡 Vui lòng điền email và tên trong form bên trái để đặt lịch
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -433,16 +516,16 @@ export default function Footer() {
               Công ty tư vấn cung cấp các sản phẩm thực tế như giải pháp. Giảm thiểu vốn cho doanh nghiệp: Nhân sự, Tài chính, Thời gian.
             </p>
             <div className="flex gap-4">
-              <a href="https://facebook.com/sutralab" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-gray-800">
+              <a href={contactInfo.social.facebook} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-gray-800">
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="https://linkedin.com/company/sutralab" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-gray-800">
+              <a href={contactInfo.social.linkedin} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-gray-800">
                 <Linkedin className="h-5 w-5" />
               </a>
-              <a href="https://twitter.com/sutralab" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-gray-800">
+              <a href={contactInfo.social.twitter} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-gray-800">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="https://youtube.com/@sutralab" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-gray-800">
+              <a href={contactInfo.social.youtube} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded-lg hover:bg-gray-800">
                 <Youtube className="h-5 w-5" />
               </a>
             </div>
@@ -473,20 +556,20 @@ export default function Footer() {
             <ul className="space-y-4 text-gray-400">
               <li className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-blue-400 flex-shrink-0" />
-                <a href="mailto:minhtq@aisutralab.com" className="hover:text-white transition-colors">
-                  minhtq@aisutralab.com
+                <a href={`mailto:${contactInfo.email.primary}`} className="hover:text-white transition-colors">
+                  {contactInfo.email.primary}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-cyan-400 flex-shrink-0" />
-                <a href="tel:+84923370804" className="hover:text-white transition-colors">
-                  +84 923 370 804
+                <a href={`tel:${contactInfo.phone.primary}`} className="hover:text-white transition-colors">
+                  {contactInfo.phone.display.primary}
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-cyan-400 flex-shrink-0" />
-                <a href="tel:+84386602022" className="hover:text-white transition-colors">
-                  +84 386 602 022
+                <a href={`tel:${contactInfo.phone.secondary}`} className="hover:text-white transition-colors">
+                  {contactInfo.phone.display.secondary}
                 </a>
               </li>
             </ul>

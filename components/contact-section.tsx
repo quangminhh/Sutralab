@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { contactInfo } from '@/lib/contact-info'
 
 interface ContactSectionProps {
   title?: string
@@ -17,15 +18,15 @@ interface ContactSectionProps {
 }
 
 const defaultSocialLinks = [
-  { id: '1', name: 'LinkedIn', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/linkedin.svg', href: 'https://linkedin.com/company/sutralab' },
-  { id: '2', name: 'Facebook', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/facebook.svg', href: 'https://facebook.com/sutralab' },
-  { id: '3', name: 'Twitter', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/x.svg', href: 'https://twitter.com/sutralab' },
+  { id: '1', name: 'LinkedIn', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/linkedin.svg', href: contactInfo.social.linkedin },
+  { id: '2', name: 'Facebook', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/facebook.svg', href: contactInfo.social.facebook },
+  { id: '3', name: 'Twitter', iconSrc: 'https://cdn.jsdelivr.net/npm/simple-icons@v5/icons/x.svg', href: contactInfo.social.twitter },
 ]
 
 export const ContactSection: React.FC<ContactSectionProps> = ({
   title = "Chúng tôi có thể biến dự án mơ ước của bạn thành hiện thực",
   mainMessage = "Hãy trò chuyện với chúng tôi! 👋",
-  contactEmail = "minhtq@aisutralab.com",
+  contactEmail = contactInfo.email.primary,
   socialLinks = defaultSocialLinks,
   backgroundImageSrc = "https://images.unsplash.com/photo-1742273330004-ef9c9d228530?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHx0b3BpYy1mZWVkfDY0fENEd3V3WEpBYkV3fHxlbnwwfHx8fHw%3D&auto=format&fit=crop&q=60&w=900",
   onSubmit,
