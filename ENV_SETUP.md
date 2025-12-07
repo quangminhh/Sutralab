@@ -26,6 +26,29 @@ CAL_COM_API_KEY=cal_live_xxxxxxxxxxxxxxxxxxxxx
 - Không chia sẻ API key trong code hoặc commit lên Git
 - Thêm `.env.local` vào `.gitignore` (đã có sẵn)
 
+### 1.1. Cal.com Event Type ID (Optional but Recommended)
+
+**Cách lấy Event Type ID:**
+
+1. Đăng nhập vào Cal.com dashboard
+2. Vào **"Event Types"** hoặc **"My Event Types"**
+3. Click vào event type bạn muốn sử dụng (ví dụ: "30min Meeting")
+4. Trong URL hoặc settings, bạn sẽ thấy Event Type ID (số, ví dụ: `123456`)
+5. Hoặc sử dụng API để lấy:
+   ```bash
+   curl -X GET "https://api.cal.com/v1/event-types" \
+     -H "Authorization: Bearer YOUR_API_KEY"
+   ```
+
+**Thêm vào `.env.local` (Optional):**
+```env
+CAL_COM_EVENT_TYPE_ID=123456
+```
+
+**Lưu ý:**
+- Nếu không có `CAL_COM_EVENT_TYPE_ID`, hệ thống sẽ tự động lấy event type đầu tiên từ Cal.com
+- Nếu có nhiều event types, nên chỉ định rõ ID để tránh nhầm lẫn
+
 ---
 
 ## Optional Variables

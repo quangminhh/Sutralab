@@ -174,6 +174,8 @@ export default function Footer() {
           startTime: bookingDateTime.toISOString(),
           attendeeEmail: formData.email,
           attendeeName: formData.name,
+          timeZone: 'Asia/Ho_Chi_Minh', // Vietnam timezone (GMT+7)
+          language: 'vi', // Vietnamese language
         }),
       })
 
@@ -204,8 +206,11 @@ export default function Footer() {
         setSelectedDate(null)
         setSelectedTime(null)
       } else {
+        const errorMessage = data.message || 'Vui lòng thử lại sau hoặc liên hệ trực tiếp.'
+        const errorHint = data.hint ? `\n\n💡 ${data.hint}` : ''
         toast.error('Không thể đặt lịch', {
-          description: data.message || 'Vui lòng thử lại sau hoặc liên hệ trực tiếp.',
+          description: `${errorMessage}${errorHint}`,
+          duration: 8000,
         })
       }
     } catch (error) {
@@ -500,7 +505,7 @@ export default function Footer() {
                 
                 {selectedDate && selectedTime && (!formData.email || !formData.name) && (
                   <p className="text-xs text-yellow-400 mt-2 text-center">
-                    💡 Vui lòng điền email và tên trong form bên trái để đặt lịch
+                    💡 Vui lòng điền email và tên ở form liên hệ bên trái để đặt lịch
                   </p>
                 )}
               </div>
