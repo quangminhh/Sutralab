@@ -127,13 +127,13 @@ export default function Footer() {
         toast.success('Gửi thành công!', {
           description: data.message,
         })
-        setFormData({
-          name: '',
-          email: '',
-          phone: '',
-          message: '',
-          projectType: [],
-        })
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      message: '',
+      projectType: [],
+    })
       } else {
         toast.error('Có lỗi xảy ra', {
           description: data.message || 'Vui lòng thử lại sau.',
@@ -364,8 +364,8 @@ export default function Footer() {
                       </>
                     ) : (
                       <>
-                        Gửi tin nhắn
-                        <Send className="ml-2 h-4 w-4" />
+                    Gửi tin nhắn
+                    <Send className="ml-2 h-4 w-4" />
                       </>
                     )}
                   </Button>
