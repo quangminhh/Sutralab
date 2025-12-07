@@ -111,6 +111,7 @@ export function IsometricOfficeVisual({
             loop
             muted
             playsInline
+            preload="metadata"
             className="w-full h-auto object-contain"
             style={{
               display: "block",

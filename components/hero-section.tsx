@@ -18,6 +18,7 @@ const pacifico = Pacifico({
  */
 export function HeroSection() {
   const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 })
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -33,6 +34,9 @@ export function HeroSection() {
         width: responsiveWidth,
         height: responsiveHeight,
       })
+      
+      // Check if mobile for background attachment optimization
+      setIsMobile(width < 1024)
     }
 
     updateDimensions()
@@ -56,7 +60,8 @@ export function HeroSection() {
           linear-gradient(135deg, #06b6d4 0%, #0ea5e9 25%, #22d3ee 50%, #38bdf8 75%, #0284c7 100%)
         `,
         backgroundSize: '100% 100%',
-        backgroundAttachment: 'fixed',
+        // Use 'scroll' on mobile for better performance, 'fixed' on desktop
+        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
       }}>
       
       {/* Additional animated overlay for depth */}
@@ -72,12 +77,12 @@ export function HeroSection() {
       
       {/* Text contrast overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-900/10 via-transparent to-cyan-900/10"></div>
-      <div className="max-w-7xl mx-auto px-6 w-full relative z-10 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 xl:gap-20 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10 py-12 sm:py-16 md:py-20">
+        <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 xl:gap-20 items-center">
           {/* Left: Text Content */}
-          <div className="text-left space-y-8 flex flex-col justify-center -translate-x-4 lg:-translate-x-6 xl:-translate-x-8">
+          <div className="text-left space-y-6 sm:space-y-8 flex flex-col justify-center lg:-translate-x-6 xl:-translate-x-8">
             {/* Headline */}
-            <h1 className="font-bold text-balance text-4xl sm:text-6xl md:text-7xl xl:text-8xl leading-[1.1] tracking-tight drop-shadow-lg">
+            <h1 className="font-bold text-balance text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl leading-[1.1] tracking-tight drop-shadow-lg">
               <span className="text-white drop-shadow-2xl">Xây Dựng Hệ Thống</span>
               <br />
               <span className={cn(
@@ -103,27 +108,28 @@ export function HeroSection() {
             </h1>
             
             {/* Sub-headline */}
-            <p className="text-lg sm:text-xl md:text-2xl text-white/90 leading-relaxed font-medium tracking-wide max-w-2xl drop-shadow-lg">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 leading-relaxed font-medium tracking-wide max-w-2xl drop-shadow-lg">
               Cắt Giảm Chi Phí Nhân Sự, Tối Ưu Hóa Lợi Nhuận Và Thời Gian.
             </p>
 
             {/* Strategic Introduction - Glassmorphism */}
-            <div className="bg-white/95 backdrop-blur-lg rounded-2xl p-8 border border-white/50 shadow-2xl ring-1 ring-white/20">
-              <p className="text-base sm:text-lg text-[#1a1a1a] leading-relaxed font-medium">
+            <div className="bg-white/95 backdrop-blur-lg rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 border border-white/50 shadow-2xl ring-1 ring-white/20">
+              <p className="text-sm sm:text-base md:text-lg text-[#1a1a1a] leading-relaxed font-medium">
                 Chúng tôi rà soát và xây dựng hệ thống AI để thay thế các điểm nghẽn thủ công. Ví dụ: tự động hóa luồng giấy tờ, báo cáo, marketing, CSKH hay đối soát công nợ. Mục tiêu của chúng tôi là giúp các doanh nghiệp tối ưu hóa thời gian xử lý từ vài ngày xuống vài phút, và quan trọng nhất là loại bỏ lỗi con người.{" "}
-                <span className="font-bold text-teal-700 bg-teal-50 px-2 py-1 rounded-md">
+                <span className="font-bold text-teal-700 bg-teal-50 px-2 py-1 rounded-md inline-block mt-2 sm:mt-0">
                   Chúng tôi không bán phần mềm, chúng tôi bán một dây chuyền vận hành tự động.
                 </span>
               </p>
             </div>
 
             {/* CTA Button */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <div className="flex flex-col sm:flex-row gap-4 pt-2 sm:pt-4">
               <Button
                 size="lg"
-                className="px-10 py-7 rounded-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white hover:from-teal-700 hover:to-cyan-700 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-teal-500/50 text-lg font-bold tracking-wide ring-2 ring-white/20"
+                className="px-6 sm:px-8 md:px-10 py-5 sm:py-6 md:py-7 rounded-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white hover:from-teal-700 hover:to-cyan-700 hover:scale-105 transition-all duration-300 shadow-2xl hover:shadow-teal-500/50 text-sm sm:text-base md:text-lg font-bold tracking-wide ring-2 ring-white/20 w-full sm:w-auto"
               >
-                Đặt Lịch Khảo Sát Doanh Nghiệp (Miễn Phí)
+                <span className="text-center">Đặt Lịch Khảo Sát Doanh Nghiệp</span>
+                <span className="block sm:inline sm:ml-1 text-xs sm:text-base">(Miễn Phí)</span>
               </Button>
             </div>
           </div>
@@ -137,7 +143,7 @@ export function HeroSection() {
         </div>
 
         {/* Mobile: video below content */}
-        <div className="lg:hidden mt-12">
+        <div className="lg:hidden mt-8 sm:mt-12">
           <IsometricOfficeVisual />
         </div>
       </div>
