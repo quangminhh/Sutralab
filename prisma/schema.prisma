@@ -1,0 +1,4 @@
+// Note: Using Supabase instead of Prisma
+// This file is kept for reference only
+// Database schema is managed in Supabase dashboard
+
