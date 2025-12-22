@@ -60,7 +60,29 @@ export function getSupabaseClient() {
     throw new Error('Missing Supabase environment variables. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)')
   }
 
-  supabaseClient = createClient(supabaseUrl, supabaseAnonKey)
+  // Configure Supabase client with increased timeout and retry options
+  supabaseClient = createClient(supabaseUrl, supabaseAnonKey, {
+    db: {
+      schema: 'public',
+    },
+    auth: {
+      persistSession: false,
+    },
+    global: {
+      fetch: (url, options = {}) => {
+        // Create abort controller for timeout (30 seconds)
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 30000)
+        
+        return fetch(url, {
+          ...options,
+          signal: controller.signal,
+        }).finally(() => {
+          clearTimeout(timeoutId)
+        })
+      },
+    },
+  })
   return supabaseClient
 }
 
@@ -210,40 +232,79 @@ export const db = {
       published_at: input.published ? new Date().toISOString() : null,
     }
 
-    const { data, error } = await supabase
-      .from('posts')
-      .insert(postData)
-      .select()
-      .single()
+    // Retry logic for database operations
+    const maxRetries = 3
+    let lastError: any = null
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[DB] Attempting to create post (attempt ${attempt}/${maxRetries})...`)
+        
+        const { data, error } = await supabase
+          .from('posts')
+          .insert(postData)
+          .select()
+          .single()
 
-    if (error) {
-      console.error('Error creating post:', error)
-      throw error
+        if (error) {
+          lastError = error
+          console.error(`[DB] Error creating post (attempt ${attempt}/${maxRetries}):`, error)
+          
+          // If it's a connection error, wait before retrying
+          if (attempt < maxRetries && (
+            error.message?.includes('fetch failed') ||
+            error.message?.includes('timeout') ||
+            error.message?.includes('ECONNREFUSED') ||
+            error.message?.includes('Connect Timeout')
+          )) {
+            const waitTime = attempt * 2000 // 2s, 4s, 6s
+            console.log(`[DB] Waiting ${waitTime}ms before retry...`)
+            await new Promise(resolve => setTimeout(resolve, waitTime))
+            continue
+          }
+          
+          throw error
+        }
+
+        // Success - break out of retry loop
+        console.log(`[DB] ✅ Post created successfully on attempt ${attempt}`)
+
+        // Map snake_case to camelCase
+        const post = data as any
+        return {
+          id: post.id,
+          slug: post.slug,
+          title: post.title,
+          content: post.content,
+          excerpt: post.excerpt,
+          author: post.author,
+          source: post.source,
+          tags: post.tags || [],
+          imageUrl: post.image_url,
+          imageSource: post.image_source,
+          apifySourceUrl: post.apify_source_url,
+          apifyActorId: post.apify_actor_id,
+          geminiModel: post.gemini_model,
+          geminiPrompt: post.gemini_prompt,
+          deepThinkUsed: post.deep_think_used || false,
+          published: post.published,
+          publishedAt: post.published_at ? new Date(post.published_at) : null,
+          createdAt: new Date(post.created_at),
+          updatedAt: new Date(post.updated_at),
+        } as BlogPost
+      } catch (error) {
+        // If this is the last attempt, throw the error
+        if (attempt === maxRetries) {
+          console.error(`[DB] ❌ All ${maxRetries} attempts failed. Last error:`, error)
+          throw lastError || error
+        }
+        // Otherwise, continue to next retry
+        continue
+      }
     }
-
-    // Map snake_case to camelCase
-    const post = data as any
-    return {
-      id: post.id,
-      slug: post.slug,
-      title: post.title,
-      content: post.content,
-      excerpt: post.excerpt,
-      author: post.author,
-      source: post.source,
-      tags: post.tags || [],
-      imageUrl: post.image_url,
-      imageSource: post.image_source,
-      apifySourceUrl: post.apify_source_url,
-      apifyActorId: post.apify_actor_id,
-      geminiModel: post.gemini_model,
-      geminiPrompt: post.gemini_prompt,
-      deepThinkUsed: post.deep_think_used || false,
-      published: post.published,
-      publishedAt: post.published_at ? new Date(post.published_at) : null,
-      createdAt: new Date(post.created_at),
-      updatedAt: new Date(post.updated_at),
-    } as BlogPost
+    
+    // This should never be reached, but TypeScript needs it
+    throw lastError || new Error('Failed to create post after all retries')
   },
 
   /**
