@@ -54,3 +54,4 @@ CREATE POLICY "Service role can manage all posts"
   ON posts FOR ALL
   USING (auth.role() = 'service_role');
 
+

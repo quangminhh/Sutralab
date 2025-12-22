@@ -60,14 +60,16 @@ export default function Header() {
 
         <div className="hidden lg:flex items-center gap-4">
           <Link 
-            href="#contact" 
+            href="/blog" 
             className="text-sm font-medium text-gray-700 hover:text-blue-600 transition-colors px-4 py-2 rounded-lg hover:bg-gray-50"
           >
-            Liên Hệ
+            Blog
           </Link>
-          <Button className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600 rounded-lg px-6 py-2.5 text-sm font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105">
-            Đặt Lịch Demo
-          </Button>
+          <Link href="#contact">
+            <Button className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600 rounded-lg px-6 py-2.5 text-sm font-semibold transition-all shadow-md hover:shadow-lg hover:scale-105">
+              Đặt Lịch Demo
+            </Button>
+          </Link>
         </div>
 
         {/* Mobile Navigation */}
@@ -92,14 +94,16 @@ export default function Header() {
                 ))}
                 <hr className="my-4 border-gray-200" />
                 <Link 
-                  href="#contact" 
+                  href="/blog" 
                   className="text-lg font-medium text-gray-700 hover:text-blue-600 hover:bg-blue-50 px-4 py-3 rounded-lg transition-all"
                 >
-                  Liên Hệ
+                  Blog
                 </Link>
-                <Button className="w-full mt-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600">
-                  Đặt Lịch Demo
-                </Button>
+                <Link href="#contact" className="w-full mt-4">
+                  <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600">
+                    Đặt Lịch Demo
+                  </Button>
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>

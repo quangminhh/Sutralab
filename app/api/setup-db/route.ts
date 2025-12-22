@@ -110,3 +110,4 @@ CREATE POLICY "Allow all" ON posts FOR ALL USING (true) WITH CHECK (true);
   }
 }
 
+
