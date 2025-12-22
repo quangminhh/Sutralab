@@ -252,7 +252,8 @@ DO NOT include the title as # heading - just start with the content.`
   const tags = tagsResponse
     .split(',')
     .map(tag => tag.trim().toLowerCase().replace(/['"]/g, ''))
-    .filter(tag => tag.length > 0 && tag.length < 30)
+    // Loại bỏ tag quá ngắn (1 ký tự như "h", "t"...) và quá dài
+    .filter(tag => tag.length > 1 && tag.length < 30)
     .slice(0, 6)
 
   return {
