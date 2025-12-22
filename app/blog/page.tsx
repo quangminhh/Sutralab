@@ -76,19 +76,7 @@ export default async function BlogPage() {
                       {post.excerpt}
                     </p>
 
-                    {/* Tags */}
-                    {post.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <span
-                            key={tag}
-                            className="text-xs bg-teal-100 text-teal-700 px-2 py-1 rounded"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {/* Hidden tags on list view to avoid noisy tiny labels */}
                   </div>
                 </Link>
               ))}
