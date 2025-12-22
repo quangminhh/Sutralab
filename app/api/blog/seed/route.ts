@@ -2,6 +2,8 @@
  * Seed Initial Blog Posts API Route
  * POST: Generate 3 initial blog posts using the existing AI generation pipeline
  * This is a one-time seeding endpoint to populate the blog with initial content
+ * 
+ * Returns immediately and runs generation in background to avoid timeout
  */
 
 import { NextRequest, NextResponse } from 'next/server'
@@ -20,26 +22,46 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('🌱 Starting initial blog post seeding...')
+    // Parse optional count from request body
+    const body = await request.json().catch(() => ({}))
+    const count = body.count || 3
+
+    console.log(`🌱 Starting initial blog post seeding (${count} posts)...`)
     
-    const result = await generateMultiplePosts({
-      count: 3,
+    // Run generation in background (don't await)
+    // This prevents timeout for long-running operations
+    generateMultiplePosts({
+      count,
       useDeepThink: false, // Use regular model for faster generation
       useApifyImages: true, // Use Apify images to save costs
+    }).then((result) => {
+      console.log(`✅ Seeding completed: ${result.success} success, ${result.failed} failed`)
+      result.posts.forEach((post, i) => {
+        if (post.success) {
+          console.log(`   ${i + 1}. ✅ ${post.title}`)
+        } else {
+          console.log(`   ${i + 1}. ❌ ${post.title}: ${post.error}`)
+        }
+      })
+    }).catch((error) => {
+      console.error('❌ Seeding error:', error)
     })
 
+    // Return immediately
     return NextResponse.json({
-      success: result.failed === 0,
-      message: `Đã tạo ${result.success} bài viết thành công, ${result.failed} bài viết thất bại`,
-      result,
+      success: true,
+      message: `Đang tạo ${count} bài viết trong background. Kiểm tra logs hoặc /blog sau vài phút.`,
+      status: 'processing',
+      count,
       timestamp: new Date().toISOString(),
+      note: 'Generation đang chạy trong background. Mỗi bài mất ~3-5 phút. Tổng cộng ~10-15 phút cho 3 bài.',
     })
   } catch (error) {
-    console.error('Error seeding blog posts:', error)
+    console.error('Error starting blog post seeding:', error)
     return NextResponse.json(
       {
         success: false,
-        message: 'Không thể tạo bài viết seed',
+        message: 'Không thể bắt đầu tạo bài viết seed',
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString(),
       },
