@@ -549,6 +549,7 @@ export default function Footer() {
           <div>
             <h3 className="font-bold mb-6 text-white text-lg">Sản Phẩm</h3>
             <ul className="space-y-4 text-gray-400">
+              <li><Link href="/jarvis" className="hover:text-white transition-colors">Jarvis</Link></li>
               <li><Link href="/execumate" className="hover:text-white transition-colors">ExecuMate</Link></li>
               <li><Link href="/flowhub" className="hover:text-white transition-colors">Flowhub</Link></li>
               <li><Link href="/markify" className="hover:text-white transition-colors">Markify</Link></li>
@@ -595,9 +596,11 @@ export default function Footer() {
           <p className="text-gray-400 text-sm">
             © 2025 Sutralab. Bảo lưu mọi quyền.
           </p>
-          <p className="text-gray-500 text-sm">
-            Made with ❤️ for your business
-          </p>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm">
+            <Link href="/privacy-policy" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/terms-of-service" className="text-gray-400 hover:text-white transition-colors">Terms of Service</Link>
+            <span className="text-gray-500">Made for your business</span>
+          </div>
         </div>
       </div>
     </footer>
