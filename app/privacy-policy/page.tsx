@@ -21,7 +21,7 @@ export default function PrivacyPolicyPage() {
           <li>Google Tasks data needed to list, create, update, organize, or complete tasks requested by the user.</li>
           <li>Google Calendar data needed to list availability and create, update, or organize events requested by the user.</li>
           <li>Gmail data needed for enabled email features, such as preparing, sending, reading, or organizing messages requested by the user.</li>
-          <li>Google Drive files the user explicitly selects or that are required for an enabled Drive workflow.</li>
+          <li>Google Drive file metadata and content needed to search, preview, summarize, or download files in a workflow explicitly started by the user. Jarvis does not edit, share, move, or delete Drive files through this read-only permission.</li>
           <li>Basic account information, such as name and email address, used to connect the correct Google account.</li>
         </ul>
         <p className="mt-4">Jarvis requests the narrowest permissions reasonably required for enabled features.</p>
@@ -39,6 +39,7 @@ export default function PrivacyPolicyPage() {
       <section>
         <h2 className="text-3xl font-semibold text-slate-950">4. Sharing and disclosure</h2>
         <p className="mt-4">We do not share Google user data except with service providers acting on our instructions and bound by security obligations, when the user directs Jarvis to share information with a specified recipient, or when required by law or security needs.</p>
+        <p className="mt-4">When an enabled AI feature needs message, event, task, or file content to answer the user's explicit request, Jarvis may send only the necessary content to contracted AI-processing infrastructure. Those providers process the content on our behalf for the requested feature; we do not permit Google user data to be used to train generalized AI or advertising models.</p>
         <p className="mt-4">Any transfer or use of information received from Google APIs will comply with the Google API Services User Data Policy, including its Limited Use requirements.</p>
       </section>
       <section>

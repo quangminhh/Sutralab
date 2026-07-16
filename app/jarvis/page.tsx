@@ -12,7 +12,7 @@ const capabilities = [
   ["Plan work", "Review and organize Google Tasks, priorities, and due dates at the user's request."],
   ["Manage time", "Read availability and create or update Google Calendar events with user approval."],
   ["Handle communication", "Prepare or send email only when the user activates the related Gmail feature."],
-  ["Work with files", "Use selected Google Drive files for workflows explicitly started by the user."],
+  ["Work with files", "Search, preview, summarize, or download existing Google Drive files only in workflows explicitly started by the user; read-only access cannot edit, share, move, or delete files."],
 ]
 
 export default function JarvisPage() {
